@@ -83,7 +83,8 @@ import { Task } from "./types";
 import TaskInput from "./components/TaskInput";
 import TaskList from "./components/TaskList";
 
-const API_URL = "https://taskmanagerbackend-2e67.onrender.com/api/tasks";
+const API_URL = "https://taskmanagerbackend-1-eycl.onrender.com/api/tasks";
+// const API_URL = "http://localhost:5053/api/tasks";
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
