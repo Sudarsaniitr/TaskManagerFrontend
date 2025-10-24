@@ -40,7 +40,7 @@ export default function TaskInput({ newTask, setNewTask, addTask }: TaskInputPro
         placeholder="Enter new task"
       />
       <button
-        className="btn btn-success" // Green button
+        className="btn btn-success" // green for debugging
         onClick={addTask}
       >
         Add
@@ -48,3 +48,4 @@ export default function TaskInput({ newTask, setNewTask, addTask }: TaskInputPro
     </div>
   );
 }
+

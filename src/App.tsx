@@ -82,45 +82,45 @@ import { Task } from "./types";
 import TaskInput from "./components/TaskInput";
 import TaskList from "./components/TaskList";
 
-const API_URL = "https://taskmanagerbackend-1-eycl.onrender.com/api/tasks"; // Your backend URL
+// const API_URL = "https://taskmanagerbackend-2e67.onrender.com/api/tasks"; // deployed backend
+// const API_URL = "http://localhost:5053/api/tasks";
+const API_URL = "https://taskmanagerbackend-1-eycl.onrender.com/api/tasks";
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // Load tasks from localStorage first, then backend
-  useEffect(() => {
-    const local = localStorage.getItem("tasks");
-    if (local) {
-      setTasks(JSON.parse(local));
-    } else {
-      axios.get(API_URL).then(res => setTasks(res.data));
+  // Load tasks from backend only
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setTasks(res.data);
+    } catch (error) {
+      console.error("Failed to fetch tasks from backend", error);
     }
-  }, []);
+  };
 
-  // Save tasks to localStorage whenever tasks change
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    fetchTasks();
+  }, []);
 
   const addTask = async () => {
     if (!newTask.trim()) return;
     const res = await axios.post(API_URL, { description: newTask });
-    const updatedTasks = [...tasks, res.data];
-    setTasks(updatedTasks);
+    setTasks([...tasks, res.data]);
     setNewTask("");
   };
 
   const toggleTask = async (task: Task) => {
     const updatedTask = { ...task, isCompleted: !task.isCompleted };
     await axios.put(`${API_URL}/${task.id}`, updatedTask);
-    setTasks(tasks.map(t => t.id === task.id ? updatedTask : t));
+    setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
   };
 
   const deleteTask = async (id: string) => {
     await axios.delete(`${API_URL}/${id}`);
-    setTasks(tasks.filter(t => t.id !== id));
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
   const filteredTasks = tasks.filter((t) =>
@@ -147,10 +147,6 @@ export default function App() {
       </div>
 
       <TaskList tasks={filteredTasks} toggleTask={toggleTask} deleteTask={deleteTask} />
-
-      <p className="text-muted small mt-3">
-        Note: Tasks are stored in-memory on the backend. They reset on server restart. Frontend uses localStorage to persist tasks.
-      </p>
     </div>
   );
 }
