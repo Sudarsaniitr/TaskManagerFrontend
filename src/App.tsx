@@ -75,7 +75,6 @@
 //     </div>
 //   );
 // }
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -83,39 +82,45 @@ import { Task } from "./types";
 import TaskInput from "./components/TaskInput";
 import TaskList from "./components/TaskList";
 
-const API_URL = "https://taskmanagerbackend-1-eycl.onrender.com/api/tasks";
-// const API_URL = "http://localhost:5053/api/tasks";
+const API_URL = "https://taskmanagerbackend-1-eycl.onrender.com/api/tasks"; // Your backend URL
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const fetchTasks = async () => {
-    const res = await axios.get(API_URL);
-    setTasks(res.data);
-  };
-
+  // Load tasks from localStorage first, then backend
   useEffect(() => {
-    fetchTasks();
+    const local = localStorage.getItem("tasks");
+    if (local) {
+      setTasks(JSON.parse(local));
+    } else {
+      axios.get(API_URL).then(res => setTasks(res.data));
+    }
   }, []);
+
+  // Save tasks to localStorage whenever tasks change
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = async () => {
     if (!newTask.trim()) return;
     const res = await axios.post(API_URL, { description: newTask });
-    setTasks([...tasks, res.data]);
+    const updatedTasks = [...tasks, res.data];
+    setTasks(updatedTasks);
     setNewTask("");
   };
 
   const toggleTask = async (task: Task) => {
-    const updated = { ...task, isCompleted: !task.isCompleted };
-    await axios.put(`${API_URL}/${task.id}`, updated);
-    setTasks(tasks.map((t) => (t.id === task.id ? updated : t)));
+    const updatedTask = { ...task, isCompleted: !task.isCompleted };
+    await axios.put(`${API_URL}/${task.id}`, updatedTask);
+    setTasks(tasks.map(t => t.id === task.id ? updatedTask : t));
   };
 
   const deleteTask = async (id: string) => {
     await axios.delete(`${API_URL}/${id}`);
-    setTasks(tasks.filter((t) => t.id !== id));
+    setTasks(tasks.filter(t => t.id !== id));
   };
 
   const filteredTasks = tasks.filter((t) =>
@@ -128,6 +133,7 @@ export default function App() {
     <div className="container mt-5">
       <h3 className="mb-4 text-center">Task Manager</h3>
       <TaskInput newTask={newTask} setNewTask={setNewTask} addTask={addTask} />
+      
       <div className="btn-group mb-3">
         {["all", "active", "completed"].map((f) => (
           <button
@@ -139,7 +145,12 @@ export default function App() {
           </button>
         ))}
       </div>
+
       <TaskList tasks={filteredTasks} toggleTask={toggleTask} deleteTask={deleteTask} />
+
+      <p className="text-muted small mt-3">
+        Note: Tasks are stored in-memory on the backend. They reset on server restart. Frontend uses localStorage to persist tasks.
+      </p>
     </div>
   );
 }

@@ -36,14 +36,13 @@
 //     </ul>
 //   );
 // }
-
 import React from "react";
 import { Task } from "../types";
 
 interface TaskListProps {
   tasks: Task[];
-  toggleTask: (task: Task) => void;   // ✅ accepts a Task
-  deleteTask: (id: string) => void;   // ✅ id is a string (GUID)
+  toggleTask: (task: Task) => void;
+  deleteTask: (id: string) => void;
 }
 
 export default function TaskList({ tasks, toggleTask, deleteTask }: TaskListProps) {
@@ -63,7 +62,7 @@ export default function TaskList({ tasks, toggleTask, deleteTask }: TaskListProp
               type="checkbox"
               className="form-check-input me-2"
               checked={task.isCompleted}
-              onChange={() => toggleTask(task)}  // ✅ passes full task
+              onChange={() => toggleTask(task)}
             />
             <span
               style={{
@@ -75,7 +74,7 @@ export default function TaskList({ tasks, toggleTask, deleteTask }: TaskListProp
           </div>
           <button
             className="btn btn-danger btn-sm"
-            onClick={() => deleteTask(task.id)} // ✅ passes string GUID
+            onClick={() => deleteTask(task.id)}
           >
             Delete
           </button>

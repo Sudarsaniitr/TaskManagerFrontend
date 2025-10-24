@@ -40,7 +40,7 @@ export default function TaskInput({ newTask, setNewTask, addTask }: TaskInputPro
         placeholder="Enter new task"
       />
       <button
-        className="btn btn-success"  // ✅ changed from btn-primary to btn-success
+        className="btn btn-success" // Green button
         onClick={addTask}
       >
         Add
